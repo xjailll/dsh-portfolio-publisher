@@ -1,0 +1,2 @@
+
+4526d8b70289ebab62f555c716c61a667024835c	{"key":"make-fetch-happen:request-cache:http://registry.npmmirror.com/@typescript%2ftypescript-linux-mips64el","integrity":null,"time":1788020446875,"size":"262","metadata":{"time":1788020446875,"url":"http://registry.npmmirror.com/@typescript%2ftypescript-linux-mips64el","reqHeaders":{"accept":"application/json"},"resHeaders":{"content-type":"text/html","date":"Sat, 29 Aug 2026 16:20:47 GMT","location":"https://registry.npmmirror.com/@typescript%2ftypescript-linux-mips64el"},"options":{"compress":true},"status":301}}

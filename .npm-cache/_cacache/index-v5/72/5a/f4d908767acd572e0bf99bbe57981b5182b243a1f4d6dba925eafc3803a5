@@ -1,0 +1,2 @@
+
+85668194a7c15ca40330df7d1f5f1f7cb2388966	{"key":"make-fetch-happen:request-cache:http://registry.npmmirror.com/@typescript%2ftypescript-darwin-arm64","integrity":null,"time":1788020446854,"size":"262","metadata":{"time":1788020446854,"url":"http://registry.npmmirror.com/@typescript%2ftypescript-darwin-arm64","reqHeaders":{"accept":"application/json"},"resHeaders":{"content-type":"text/html","date":"Sat, 29 Aug 2026 16:20:47 GMT","location":"https://registry.npmmirror.com/@typescript%2ftypescript-darwin-arm64"},"options":{"compress":true},"status":301}}

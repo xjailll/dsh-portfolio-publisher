@@ -1,0 +1,2 @@
+
+9efb872e22d0c29c133e55345ccb8340758baa28	{"key":"make-fetch-happen:request-cache:http://registry.npmmirror.com/@typescript%2ftypescript-aix-ppc64","integrity":null,"time":1788020446878,"size":"262","metadata":{"time":1788020446878,"url":"http://registry.npmmirror.com/@typescript%2ftypescript-aix-ppc64","reqHeaders":{"accept":"application/json"},"resHeaders":{"content-type":"text/html","date":"Sat, 29 Aug 2026 16:20:47 GMT","location":"https://registry.npmmirror.com/@typescript%2ftypescript-aix-ppc64"},"options":{"compress":true},"status":301}}

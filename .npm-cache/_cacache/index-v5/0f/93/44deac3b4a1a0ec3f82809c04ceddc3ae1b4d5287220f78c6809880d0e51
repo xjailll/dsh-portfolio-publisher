@@ -1,0 +1,2 @@
+
+77ff5fe3d5d96d824c611929ca511df74e530ef5	{"key":"make-fetch-happen:request-cache:http://registry.npmmirror.com/@typescript%2ftypescript-linux-arm64","integrity":null,"time":1788020446876,"size":"262","metadata":{"time":1788020446876,"url":"http://registry.npmmirror.com/@typescript%2ftypescript-linux-arm64","reqHeaders":{"accept":"application/json"},"resHeaders":{"content-type":"text/html","date":"Sat, 29 Aug 2026 16:20:47 GMT","location":"https://registry.npmmirror.com/@typescript%2ftypescript-linux-arm64"},"options":{"compress":true},"status":301}}

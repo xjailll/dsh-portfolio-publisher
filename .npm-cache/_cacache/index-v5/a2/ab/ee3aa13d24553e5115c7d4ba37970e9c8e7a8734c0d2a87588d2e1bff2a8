@@ -1,0 +1,2 @@
+
+810ce523e867258ea9ff2da21bfcf7c796d6c719	{"key":"make-fetch-happen:request-cache:http://registry.npmmirror.com/@typescript%2ftypescript-sunos-x64","integrity":null,"time":1788020447249,"size":"262","metadata":{"time":1788020447249,"url":"http://registry.npmmirror.com/@typescript%2ftypescript-sunos-x64","reqHeaders":{"accept":"application/json"},"resHeaders":{"content-type":"text/html","date":"Sat, 29 Aug 2026 16:20:47 GMT","location":"https://registry.npmmirror.com/@typescript%2ftypescript-sunos-x64"},"options":{"compress":true},"status":301}}

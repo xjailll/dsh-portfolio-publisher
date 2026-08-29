@@ -1,0 +1,2 @@
+
+41b0cc7b753b174307ba58cc99d96599efb87328	{"key":"make-fetch-happen:request-cache:http://registry.npmmirror.com/@typescript%2ftypescript-openbsd-x64","integrity":null,"time":1788020447250,"size":"262","metadata":{"time":1788020447250,"url":"http://registry.npmmirror.com/@typescript%2ftypescript-openbsd-x64","reqHeaders":{"accept":"application/json"},"resHeaders":{"content-type":"text/html","date":"Sat, 29 Aug 2026 16:20:47 GMT","location":"https://registry.npmmirror.com/@typescript%2ftypescript-openbsd-x64"},"options":{"compress":true},"status":301}}

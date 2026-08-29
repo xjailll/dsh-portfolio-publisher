@@ -1,0 +1,2 @@
+
+9f31361226b612a97a8037190ac458069bf7d552	{"key":"make-fetch-happen:request-cache:http://registry.npmmirror.com/@typescript%2ftypescript-netbsd-x64","integrity":null,"time":1788020447108,"size":"262","metadata":{"time":1788020447108,"url":"http://registry.npmmirror.com/@typescript%2ftypescript-netbsd-x64","reqHeaders":{"accept":"application/json"},"resHeaders":{"content-type":"text/html","date":"Sat, 29 Aug 2026 16:20:47 GMT","location":"https://registry.npmmirror.com/@typescript%2ftypescript-netbsd-x64"},"options":{"compress":true},"status":301}}

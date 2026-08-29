@@ -1,0 +1,59 @@
+0 verbose cli E:\node.exe E:\node_modules\npm\bin\npm-cli.js
+1 info using npm@11.17.0
+2 info using node@v24.19.0
+3 silly config load:file:E:\node_modules\npm\npmrc
+4 silly config load:file:D:\2026论文相关\dsh-portfolio-publisher\.npmrc
+5 silly config load:file:C:\Users\29479\.npmrc
+6 silly config load:file:C:\Users\29479\AppData\Roaming\npm\etc\npmrc
+7 verbose title npm install typescript@5.9.0
+8 verbose argv "install" "--save-dev" "typescript@5.9.0" "--legacy-peer-deps" "--cache" "D:\\2026论文相关\\dsh-portfolio-publisher\\.npm-cache" "--fetch-timeout" "15000"
+9 verbose logfile logs-max:10 dir:D:\2026论文相关\dsh-portfolio-publisher\.npm-cache\_logs\2026-08-29T16_20_32_929Z-
+10 verbose logfile D:\2026论文相关\dsh-portfolio-publisher\.npm-cache\_logs\2026-08-29T16_20_32_929Z-debug-0.log
+11 silly logfile done cleaning log files
+12 silly packumentCache heap:4496293888 maxSize:1124073472 maxEntrySize:562036736
+13 silly idealTree buildDeps
+14 silly fetch manifest @types/node@^24.13.3
+15 silly packumentCache full:http://registry.npmmirror.com/@types%2fnode cache-miss
+16 http fetch GET 200 https://registry.npmmirror.com/@types%2fnode 1623ms (cache miss)
+17 silly packumentCache full:http://registry.npmmirror.com/@types%2fnode set size:1168251 disposed:false
+18 silly fetch manifest typescript@5.9.0
+19 silly packumentCache full:http://registry.npmmirror.com/typescript cache-miss
+20 http fetch GET 200 https://registry.npmmirror.com/typescript 479ms (cache miss)
+21 silly packumentCache full:http://registry.npmmirror.com/typescript set size:1711742 disposed:false
+22 silly placeDep ROOT @types/node@24.13.3 OK for: @dsh-external/dsh-portfolio-publisher@0.0.1 want: ^24.13.3
+23 silly placeDep ROOT typescript@ OK for: @dsh-external/dsh-portfolio-publisher@0.0.1 want: 5.9.0
+24 silly fetch manifest undici-types@~7.18.0
+25 silly packumentCache full:http://registry.npmmirror.com/undici-types cache-miss
+26 http fetch GET 200 https://registry.npmmirror.com/npm 2281ms
+27 http fetch GET 200 https://registry.npmmirror.com/undici-types 66ms (cache miss)
+28 silly packumentCache full:http://registry.npmmirror.com/undici-types set size:47441 disposed:false
+29 silly placeDep ROOT undici-types@7.18.2 OK for: @types/node@24.13.3 want: ~7.18.0
+30 verbose type version
+31 verbose stack typescript: No matching version found for typescript@5.9.0.
+31 verbose stack     at module.exports (E:\node_modules\npm\node_modules\npm-pick-manifest\lib\index.js:210:23)
+31 verbose stack     at RegistryFetcher.manifest (E:\node_modules\npm\node_modules\pacote\lib\registry.js:130:54)
+31 verbose stack     at async #fetchManifest (E:\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\build-ideal-tree.js:1319:20)
+31 verbose stack     at async #nodeFromEdge (E:\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\build-ideal-tree.js:1140:19)
+31 verbose stack     at async #buildDepStep (E:\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\build-ideal-tree.js:984:15)
+31 verbose stack     at async Arborist.buildIdealTree (E:\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\build-ideal-tree.js:179:7)
+31 verbose stack     at async Promise.all (index 1)
+31 verbose stack     at async Arborist.reify (E:\node_modules\npm\node_modules\@npmcli\arborist\lib\arborist\reify.js:112:5)
+31 verbose stack     at async Install.exec (E:\node_modules\npm\lib\commands\install.js:158:5)
+31 verbose stack     at async Npm.exec (E:\node_modules\npm\lib\npm.js:193:9)
+32 error code ETARGET
+33 error notarget No matching version found for typescript@5.9.0.
+34 error notarget In most cases you or one of your dependencies are requesting a package version that doesn't exist.
+35 silly unfinished npm timer reify 1788020433472
+36 silly unfinished npm timer reify:loadTrees 1788020433472
+37 verbose cwd D:\2026论文相关\dsh-portfolio-publisher
+38 verbose os Windows_NT 10.0.26200
+39 verbose node v24.19.0
+40 verbose npm  v11.17.0
+41 notice
+41 notice New major version of npm available! 11.17.0 -> 12.0.2
+41 notice Changelog: https://github.com/npm/cli/releases/tag/v12.0.2
+41 notice To update run: npm install -g npm@12.0.2
+41 notice  { force: true, Symbol(proc-log.meta): true }
+42 verbose exit 1
+43 verbose code 1
+44 error A complete log of this run can be found in: D:\2026论文相关\dsh-portfolio-publisher\.npm-cache\_logs\2026-08-29T16_20_32_929Z-debug-0.log

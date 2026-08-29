@@ -1,0 +1,2 @@
+
+da8a12279740537372846f850a26a2de9b315662	{"key":"make-fetch-happen:request-cache:http://registry.npmmirror.com/@typescript%2ftypescript-freebsd-x64","integrity":null,"time":1788020446875,"size":"262","metadata":{"time":1788020446875,"url":"http://registry.npmmirror.com/@typescript%2ftypescript-freebsd-x64","reqHeaders":{"accept":"application/json"},"resHeaders":{"content-type":"text/html","date":"Sat, 29 Aug 2026 16:20:47 GMT","location":"https://registry.npmmirror.com/@typescript%2ftypescript-freebsd-x64"},"options":{"compress":true},"status":301}}
