@@ -4,7 +4,7 @@ import { join } from 'node:path'
 
 const OWNER = 'xjailll'
 const REPO = 'dsh-portfolio-publisher'
-const VERSION = '0.3.0'
+const VERSION = '0.3.1'
 const TAG = `v${VERSION}`
 const TGZ = join(process.cwd(), `dsh-external-dsh-portfolio-publisher-${VERSION}.tgz`)
 
