@@ -1,2 +1,0 @@
-
-7c2f333a07581898834178fd473adfaa753fe661	{"key":"make-fetch-happen:request-cache:http://registry.npmmirror.com/@typescript%2ftypescript-linux-s390x","integrity":null,"time":1788020446999,"size":"262","metadata":{"time":1788020446999,"url":"http://registry.npmmirror.com/@typescript%2ftypescript-linux-s390x","reqHeaders":{"accept":"application/json"},"resHeaders":{"content-type":"text/html","date":"Sat, 29 Aug 2026 16:20:47 GMT","location":"https://registry.npmmirror.com/@typescript%2ftypescript-linux-s390x"},"options":{"compress":true},"status":301}}
