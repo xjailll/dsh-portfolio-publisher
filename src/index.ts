@@ -472,24 +472,52 @@ async function githubInit(args: { root: string; repoName: string; username?: str
     run('git', ['commit', '-m', commitMessage], root)
   }
 
-  const remote = run('git', ['remote', 'get-url', 'origin'], root)
-  if (args.username && !remote) {
-    const gh = run('gh', ['repo', 'create', `${args.username}/${args.repoName}`, '--' + visibility, '--source', root, '--remote', 'origin'], root)
-    if (!gh && !run('gh', ['--version'], root)) {
-      return '❌ gh CLI 未安装或未登录。请先安装 GitHub CLI 并执行 gh auth login，或手动创建仓库后添加 remote。'
+    const remote = run('git', ['remote', 'get-url', 'origin'], root)
+    const guessedUrl = args.username ? `https://github.com/${args.username}/${args.repoName}.git` : ''
+    const ghAvailable = !!run('gh', ['--version'], root)
+
+    if (!remote) {
+      if (args.username) {
+        if (ghAvailable) {
+          // 有 gh：直接创建仓库并设置 remote
+          run('gh', ['repo', 'create', `${args.username}/${args.repoName}`, '--' + visibility, '--source', root, '--remote', 'origin'], root)
+        } else {
+          // 没有 gh：先按 GitHub 仓库地址规则添加 remote，仓库不存在时 push 会失败并给出手动指引
+          run('git', ['remote', 'add', 'origin', guessedUrl], root)
+        }
+      } else {
+        return `❌ 缺少 GitHub 仓库地址。请先填写 GitHub 用户名，或手动创建仓库后运行:\n  git remote add origin https://github.com/你的用户名/${args.repoName}.git`
+      }
     }
-  } else if (!remote) {
-    return `❌ 缺少 GitHub 仓库地址。请先创建仓库并运行:\n  git remote add origin https://github.com/你的用户名/${args.repoName}.git`
-  }
 
-  if (push) {
-    const branch = run('git', ['branch', '--show-current'], root) || 'main'
-    const pushed = run('git', ['push', '-u', 'origin', branch], root)
-    if (!pushed) return `✅ 本地提交完成，但推送失败（请检查 remote/权限）。\n\n远程: ${run('git', ['remote', 'get-url', 'origin'], root) || '未设置'}`
-  }
+    if (push) {
+      const branch = run('git', ['branch', '--show-current'], root) || 'main'
+      const pushed = run('git', ['push', '-u', 'origin', branch], root)
+      if (!pushed) {
+        const remoteUrl = run('git', ['remote', 'get-url', 'origin'], root) || guessedUrl || '未设置'
+        if (!ghAvailable && remoteUrl) {
+          return `❌ 推送失败。这可能是因为 GitHub 仓库还不存在，或没有权限。
 
-  const url = run('git', ['remote', 'get-url', 'origin'], root)
-  return `✅ GitHub 发布完成！\n\n仓库: ${url || 'https://github.com/' + (args.username ? args.username + '/' : '') + args.repoName}\n分支: ${run('git', ['branch', '--show-current'], root) || 'main'}\n提交: ${commitMessage}`
+请手动创建仓库后重试：
+
+1. 打开 https://github.com/new
+2. Repository name 填：${args.repoName}
+3. 选择 ${visibility}
+4. 不要勾选 README / .gitignore / License
+5. 点击 Create repository
+6. 创建完成后再次运行本插件，或手动执行：
+
+   git remote add origin ${remoteUrl}
+   git push -u origin main
+
+当前远程：${remoteUrl}`
+        }
+        return `✅ 本地提交完成，但推送失败（请检查 remote/权限）。\n\n远程: ${remoteUrl}`
+      }
+    }
+
+    const url = run('git', ['remote', 'get-url', 'origin'], root)
+    return `✅ GitHub 发布完成！\n\n仓库: ${url || guessedUrl || 'https://github.com/' + (args.username ? args.username + '/' : '') + args.repoName}\n分支: ${run('git', ['branch', '--show-current'], root) || 'main'}\n提交: ${commitMessage}`
 }
 
 // ─────────────────────────────────────────────────────────────
