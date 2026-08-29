@@ -19,6 +19,19 @@ DSH_CHECKOUT=<checkout> bash scripts/build.sh
 # dev_inject_plugin D:\2026论文相关\dsh-portfolio-publisher
 ```
 
+## 测试
+
+```bash
+node scripts/test-tools.mjs
+```
+
+测试会覆盖：
+- 4 个工具是否成功注册
+- `scan_repo` 扫描真实项目
+- `sanitize_check` 识别 AppID / 云环境 ID / Token / 本地路径
+- `generate_readme` 生成 README
+- `github_init` 在缺少 Git 身份时安全退出
+
 ## 示例
 
 ```
