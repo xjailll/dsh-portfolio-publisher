@@ -1,117 +1,293 @@
-# @dsh-external/dsh-portfolio-publisher
+# 📦 DSH Portfolio Publisher
 
-GitHub 求职仓库一键发布助手：LLM 生成专业 README、扫描项目、脱敏检查、Web 面板、初始化仓库并推送。
+> **DeepSeek Harness 插件：GitHub 求职仓库一键发布助手**
+>
+> 扫描本地项目 → LLM 生成专业 README → 安全检查 → Web 可视化面板 → 一键推送 GitHub。
 
-## 工具
+[![DSH](https://img.shields.io/badge/DeepSeek%20Harness-Plugin-4D6BFE)](https://github.com/deepseek-ai/deepseek-harness)
+[![Version](https://img.shields.io/badge/version-0.3.0-22c55e)](https://github.com/xjailll/dsh-portfolio-publisher/releases)
+[![License](https://img.shields.io/badge/License-BSD--3--Clause-blue)](LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-7.x-3178c6)](https://www.typescriptlang.org/)
+[![Node](https://img.shields.io/badge/Node.js-18%2B-339933)](https://nodejs.org/)
 
-| 工具 | 说明 |
-| --- | --- |
-| `scan_repo` | 扫描项目，识别技术栈、目录结构、README/License/Git 状态和敏感信息 |
-| `generate_readme` | 基于 LLM 生成专业招聘向 README.md，支持自定义提示词 |
-| `sanitize_check` | 检查仓库中的 AppID/Token/Secret/云环境 ID/本地绝对路径泄露点 |
-| `github_init` | 初始化 Git、创建 GitHub 仓库并推送（自动配置 Git 提交身份；没有 gh CLI 时自动尝试 remote + push） |
+---
 
-## README 生成
+## 🧭 这个插件解决什么问题
 
-`generate_readme` 默认会调用 DSH LLM，根据扫描到的技术栈、目录、依赖等信息，生成一份**专业、真实、有说服力**的求职作品集 README。
+很多开发者做完项目后，不知道怎样把 GitHub 仓库整理成“面试官爱看的作品集”：
 
-默认提示词要求包含：
+- README 写得太简单，像临时占位符；
+- 项目里残留 AppID、Token、本地绝对路径等敏感信息；
+- 不会初始化 Git / 创建 GitHub 仓库 / 推送；
+- 没有可视化界面，操作全靠命令行。
 
-- 项目名称与一句话定位
-- 技术栈徽章
+`dsh-portfolio-publisher` 把这一整套流程变成 DSH 插件：
+
+```text
+扫描仓库 → 识别技术栈 → LLM 生成 README → 安全检查 → 预览 → 确认 → 推送 GitHub
+```
+
+---
+
+## ✨ 核心功能
+
+### 1. 仓库扫描
+
+自动识别：
+
+- 技术栈（Vue / React / Node.js / MongoDB / 微信小程序 / Python / Go / Java 等）
+- 顶层目录结构
+- package.json / 依赖分布
+- README / License / Git 状态
+- 常见敏感信息泄露点
+
+### 2. LLM 生成专业 README
+
+不再是固定模板，而是基于 DSH LLM 生成：
+
 - 项目亮点
-- 功能特性
+- 功能特性（按用户端 / 管理端 / 后端分组）
 - 技术栈表格
 - 系统架构
 - 快速开始
 - API 概览
-- 文档入口
 - 测试说明
 - 未来规划
-- 关于/License
+- License / 关于
 
-### 自定义提示词
+支持**自定义提示词**，你可以要求 LLM 突出全栈能力、强调数据库设计、换成英文、改成活泼语气等。
 
-你可以通过 `prompt` 参数传入自己的要求，优先级最高：
+### 3. 安全检查
 
-```
-generate_readme(
-  root="D:/projects/my-project",
-  description="社区服务全栈项目",
-  author="徐杰",
-  repo="https://github.com/xjailll/my-project",
-  prompt="突出我的全栈能力，重点写系统架构和数据库设计，语气专业克制",
-  overwrite=true
-)
-```
+扫描并报告：
 
-也可以在 Web 面板的“自定义 README 提示词”文本框中填写。
+- 微信 AppID
+- 云开发环境 ID
+- Token / Secret / API Key
+- 硬编码密码
+- 本地绝对路径
+- AK/SK 云厂商密钥
 
-## Web 面板
+### 4. Web 可视化面板
 
-插件注册了浏览器可视化面板，注入后访问：
+插件内置 Web 面板，不需要额外前端项目：
 
 ```text
 http://127.0.0.1:3080/portfolio
 ```
 
-面板支持：
+支持：
 
-- 🔍 扫描仓库（支持多行批量扫描）
-- 📝 基于 LLM 生成 README 并在浏览器预览
-- 🛡️ 可视化展示安全检查报告（泄露文件、类型、行号）
-- 🚀 手动确认后发布到 GitHub（带确认弹窗，不会误操作）
-- 👤 自动配置 Git 提交身份：没有本地 Git 身份时，会用 GitHub 用户名自动设置 `user.name` 和 `user@users.noreply.github.com`；也支持手动填写 Git 姓名/邮箱
+- 多仓库批量扫描
+- README 浏览器预览
+- 泄露点可视化列表
+- 手动确认后发布 GitHub
+
+### 5. 无需 gh CLI 也能发布
+
+自动处理 Git 身份：
+
+- 有 `gh` → 自动创建仓库并推送；
+- 没有 `gh` → 自动尝试 `git remote add origin + git push`；
+- 仓库不存在 → 返回详细手动创建步骤；
+- 已有 remote → 直接推送。
+
+---
+
+## 🧩 插件工具
+
+| 工具 | 说明 |
+| --- | --- |
+| `scan_repo` | 扫描项目，输出技术栈、结构、README/License/Git、敏感信息 |
+| `generate_readme` | 基于 LLM 生成专业 README，支持自定义提示词 |
+| `sanitize_check` | 检查 AppID / Token / Secret / 云环境 ID / 本地路径泄露点 |
+| `github_init` | 初始化 Git、创建 GitHub 仓库并推送 |
+
+### 工具调用示例
+
+```text
+scan_repo(root="D:/projects/my-project")
+```
+
+```text
+generate_readme(
+  root="D:/projects/my-project",
+  description="社区服务全栈项目",
+  author="徐杰",
+  repo="https://github.com/xjailll/my-project",
+  prompt="突出全栈能力，重点写系统架构和数据库设计",
+  overwrite=true
+)
+```
+
+```text
+sanitize_check(root="D:/projects/my-project")
+```
+
+```text
+github_init(
+  root="D:/projects/my-project",
+  repoName="my-project",
+  username="xjailll",
+  gitName="徐杰",
+  gitEmail="2947995340@qq.com",
+  visibility="public",
+  commitMessage="feat: 初始化项目"
+)
+```
+
+---
+
+## 🖥️ Web 面板
+
+插件注入后，浏览器访问：
+
+```text
+http://127.0.0.1:3080/portfolio
+```
 
 ### Web API
 
 | 方法 | 路径 | 说明 |
 | --- | --- | --- |
-| GET | `/portfolio` | 可视化面板页面 |
+| GET | `/portfolio` | 可视化面板 |
 | POST | `/portfolio/api/scan` | 扫描仓库，返回结构化结果 |
-| POST | `/portfolio/api/readme` | 基于 LLM 生成 README，返回内容与路径 |
-| POST | `/portfolio/api/sanitize` | 返回敏感信息泄露点列表 |
-| POST | `/portfolio/api/push` | 执行 Git/GitHub 发布（需先人工确认） |
+| POST | `/portfolio/api/readme` | LLM 生成 README |
+| POST | `/portfolio/api/sanitize` | 返回敏感信息列表 |
+| POST | `/portfolio/api/push` | 执行 Git/GitHub 发布 |
 
-## 没有安装 gh CLI 怎么办
+### 面板使用流程
 
-`github_init` 不强制要求 `gh`：
+1. 填写项目根目录（支持多行批量扫描）；
+2. 点击 `🔍 扫描` 查看技术栈与泄露点；
+3. 填写 README 选项和自定义提示词；
+4. 点击 `📝 生成 README` 预览；
+5. 填写仓库名 / GitHub 用户名 / Git 身份；
+6. 点击 `🚀 发布到 GitHub`，确认后完成推送。
 
-1. 如果你已经手动在 GitHub 创建了空仓库，插件会直接使用 `git remote add origin + git push` 发布；
-2. 如果你填了 GitHub 用户名但还没创建仓库，插件会先尝试按 `https://github.com/用户名/仓库名.git` 添加 remote 并 push；
-3. 如果仓库不存在导致 push 失败，插件会返回详细的手动创建步骤，你只需在网页建一个空仓库后重试。
+---
 
-> 推荐流程：先在 GitHub 网页创建空仓库（不要勾选 README/.gitignore/License），再在面板里点“发布到 GitHub”，这样不需要安装任何额外 CLI。
+## 🧠 README 自定义提示词
 
-## 构建与注入
+默认提示词已经比较专业，但你可以覆盖：
+
+| 方式 | 说明 |
+| --- | --- |
+| 工具参数 `prompt` | 单次生成时指定 |
+| Web 面板文本框 | 可视化填写 |
+| 插件配置 `readmePrompt` | 全局默认提示词 |
+
+示例自定义提示词：
+
+```text
+突出我的全栈能力，重点写系统架构和数据库设计，语气专业克制。
+可以适当使用 Mermaid 架构图，不要写空话。
+```
+
+---
+
+## 🔒 安全检查与脱敏建议
+
+`sanitize_check` 会输出类似报告：
+
+```text
+⚠️ 发现 5 处潜在敏感信息：
+
+📄 admin-web/src/stores/user.js
+  - [疑似 Secret/Token] 第 20 行
+
+📄 docs/QUICK_REFERENCE.md
+  - [本地绝对路径] 第 9 行
+```
+
+建议在公开仓库前：
+
+1. 将真实 AppID / Secret / 云环境 ID 替换为占位符；
+2. 删除本地绝对路径；
+3. 检查 `.env` 是否被 Git 跟踪；
+4. 使用 `.gitignore` 排除 `node_modules`、`.env`、密钥文件。
+
+---
+
+## 📂 项目结构
+
+```text
+dsh-portfolio-publisher/
+├── src/
+│   ├── index.ts              # 插件主入口（工具 + Web 路由）
+│   └── client/               # （预留客户端面板）
+├── scripts/
+│   ├── build.sh              # DSH 构建脚本
+│   ├── test-tools.mjs        # 自动化测试
+│   └── create-gh-repo.mjs    # 通过本地 GitHub 凭据创建仓库
+├── lib/                      # 编译产物
+├── package.json
+├── tsconfig.json
+└── README.md
+```
+
+---
+
+## 🛠️ 开发与构建
+
+### 环境要求
+
+- Node.js 18+
+- DeepSeek Harness 环境
+- TypeScript
+
+### 构建
 
 ```bash
 DSH_CHECKOUT=<checkout> bash scripts/build.sh
-# 注入器环境内：
-# dev_inject_plugin D:\2026论文相关\dsh-portfolio-publisher
 ```
 
-## 测试
+### 注入
+
+```bash
+dev_inject_plugin D:\2026论文相关\dsh-portfolio-publisher
+```
+
+### 测试
 
 ```bash
 node scripts/test-tools.mjs
 ```
 
-测试会覆盖：
+测试覆盖：
 
-- 4 个工具是否成功注册
-- Web `/portfolio` 路由是否注册
-- `scan_repo` 扫描真实项目
-- `sanitize_check` 识别 AppID / 云环境 ID / Token / 本地路径
-- `generate_readme` 生成 README（LLM 不可用时自动回退内置模板）
-- `github_init` 在缺少 Git 身份时安全退出
-- Web API 的 `scan` / `readme` / `sanitize` 接口
+- 4 个工具注册
+- Web 路由注册
+- 真实项目扫描
+- README 生成
+- 敏感信息检查
+- GitHub 发布安全分支
+- Web API 接口
 
-## 示例
+---
 
-```
-scan_repo(root="D:/projects/my-project")
-generate_readme(root="D:/projects/my-project", description="xxx", author="xxx", repo="https://github.com/xxx/xxx", prompt="自定义要求", overwrite=true)
-sanitize_check(root="D:/projects/my-project")
-github_init(root="D:/projects/my-project", repoName="my-project", username="xxx", visibility="public")
-```
+## 🚀 路线图
+
+- [x] 仓库扫描
+- [x] LLM 生成 README
+- [x] 自定义提示词
+- [x] Web 可视化面板
+- [x] 无 gh CLI 发布
+- [ ] 自动脱敏替换（不只报告，直接替换占位符）
+- [ ] GitHub Topics 自动推荐
+- [ ] 多仓库批量发布队列
+- [ ] README 多语言生成（中 / 英）
+- [ ] Release 自动创建
+
+---
+
+## 📄 License
+
+[BSD-3-Clause](LICENSE)
+
+---
+
+## 🙌 感谢
+
+- [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) — “Everything is a Plugin”
+- DSH 插件生态与社区

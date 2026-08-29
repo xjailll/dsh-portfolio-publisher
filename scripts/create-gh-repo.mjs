@@ -1,5 +1,8 @@
 import { spawnSync } from 'node:child_process'
 
+const repoName = process.argv[2] || 'dsh-portfolio-publisher'
+const description = process.argv[3] || 'DeepSeek Harness 插件：GitHub 求职仓库一键发布助手'
+
 const input = 'protocol=https\nhost=github.com\n\n'
 const cred = spawnSync('git', ['credential', 'fill'], { input, encoding: 'utf8' })
 if (cred.status !== 0) throw new Error('无法读取 GitHub 凭据')
@@ -22,8 +25,8 @@ const res = await fetch('https://api.github.com/user/repos', {
     'User-Agent': 'dsh-portfolio-publisher',
   },
   body: JSON.stringify({
-    name: 'deepseek-harness-plugin',
-    description: 'DeepSeek Harness Plugin',
+    name: repoName,
+    description,
     private: false,
     auto_init: false,
     has_issues: true,
