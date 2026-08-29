@@ -4,7 +4,7 @@ import { join } from 'node:path'
 
 const OWNER = 'xjailll'
 const REPO = 'dsh-portfolio-publisher'
-const VERSION = '0.3.0'
+const VERSION = '0.3.1'
 const TAG = `v${VERSION}`
 const TGZ = join(process.cwd(), `dsh-external-dsh-portfolio-publisher-${VERSION}.tgz`)
 
@@ -62,7 +62,8 @@ GitHub 求职仓库一键发布助手。
 ## 安装
 
 \`\`\`bash
-dev_inject_plugin D:\\2026论文相关\\dsh-portfolio-publisher
+# 请替换为插件解压后的真实目录
+dev_inject_plugin /path/to/dsh-portfolio-publisher
 \`\`\`
 
 访问面板：
