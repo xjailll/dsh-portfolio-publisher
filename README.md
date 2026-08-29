@@ -9,7 +9,7 @@ GitHub 求职仓库一键发布助手：LLM 生成专业 README、扫描项目�
 | `scan_repo` | 扫描项目，识别技术栈、目录结构、README/License/Git 状态和敏感信息 |
 | `generate_readme` | 基于 LLM 生成专业招聘向 README.md，支持自定义提示词 |
 | `sanitize_check` | 检查仓库中的 AppID/Token/Secret/云环境 ID/本地绝对路径泄露点 |
-| `github_init` | 初始化 Git、创建 GitHub 仓库并推送 |
+| `github_init` | 初始化 Git、创建 GitHub 仓库并推送（自动配置 Git 提交身份） |
 
 ## README 生成
 
@@ -61,6 +61,7 @@ http://127.0.0.1:3080/portfolio
 - 📝 基于 LLM 生成 README 并在浏览器预览
 - 🛡️ 可视化展示安全检查报告（泄露文件、类型、行号）
 - 🚀 手动确认后发布到 GitHub（带确认弹窗，不会误操作）
+- 👤 自动配置 Git 提交身份：没有本地 Git 身份时，会用 GitHub 用户名自动设置 `user.name` 和 `user@users.noreply.github.com`；也支持手动填写 Git 姓名/邮箱
 
 ### Web API
 

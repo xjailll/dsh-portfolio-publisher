@@ -110,10 +110,9 @@ console.log('\n========== 测试 github_init（安全失败分支） =========='
 const githubResult = await githubTool.execute({
   root: gitFixture,
   repoName: 'demo-project',
-  username: 'xjailll',
 })
 console.log(githubResult)
-if (!githubResult.includes('未检测到 Git 用户名')) {
+if (!githubResult.includes('未检测到 Git 提交身份')) {
   throw new Error('github_init 未按预期在缺少 Git 身份时安全退出')
 }
 

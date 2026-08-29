@@ -430,7 +430,7 @@ async function createReadme(
   }
 }
 
-async function githubInit(args: { root: string; repoName: string; username?: string; visibility?: string; commitMessage?: string; push?: boolean }, defaultVisibility: string): Promise<string> {
+async function githubInit(args: { root: string; repoName: string; username?: string; gitName?: string; gitEmail?: string; visibility?: string; commitMessage?: string; push?: boolean }, defaultVisibility: string): Promise<string> {
   const root = path.resolve(args.root)
   const visibility = args.visibility || defaultVisibility || 'public'
   const commitMessage = args.commitMessage || 'Initial commit'
@@ -442,10 +442,30 @@ async function githubInit(args: { root: string; repoName: string; username?: str
     run('git', ['init'], root)
   }
 
-  const gitUser = run('git', ['config', 'user.name'], root)
-  if (!gitUser) {
-    return '❌ 未检测到 Git 用户名，请先运行: git config user.name "你的名字"'
+  // 自动配置 Git 提交身份：优先显式 gitName/gitEmail，其次用 GitHub 用户名兜底
+  let gitUser = run('git', ['config', 'user.name'], root)
+  let gitEmail = run('git', ['config', 'user.email'], root)
+  if (!gitUser && args.gitName) {
+    run('git', ['config', 'user.name', args.gitName], root)
+    gitUser = args.gitName
   }
+  if (!gitEmail && args.gitEmail) {
+    run('git', ['config', 'user.email', args.gitEmail], root)
+    gitEmail = args.gitEmail
+  }
+  if (!gitUser && args.username) {
+    run('git', ['config', 'user.name', args.username], root)
+    gitUser = args.username
+  }
+  if (!gitEmail && args.username) {
+    const fallbackEmail = `${args.username}@users.noreply.github.com`
+    run('git', ['config', 'user.email', fallbackEmail], root)
+    gitEmail = fallbackEmail
+  }
+  if (!gitUser || !gitEmail) {
+    return '❌ 未检测到 Git 提交身份。请在面板填写 Git 提交姓名/邮箱，或先运行: git config user.name "你的名字" && git config user.email "you@example.com"'
+  }
+
   run('git', ['add', '-A'], root)
   const status = run('git', ['status', '--porcelain'], root)
   if (status) {
@@ -561,6 +581,8 @@ function renderPanelHtml(panelPath: string): string {
     <div class="row">
       <input id="repoName" placeholder="仓库名（必填）">
       <input id="username" placeholder="GitHub 用户名">
+        <input id="gitName" placeholder="Git 提交姓名（可选）">
+        <input id="gitEmail" placeholder="Git 提交邮箱（可选）">
       <select id="visibility">
         <option value="public">public</option>
         <option value="private">private</option>
@@ -668,6 +690,8 @@ async function push() {
       root,
       repoName,
       username: document.getElementById('username').value.trim(),
+        gitName: document.getElementById('gitName').value.trim(),
+        gitEmail: document.getElementById('gitEmail').value.trim(),
       visibility: document.getElementById('visibility').value,
       commitMessage: document.getElementById('commitMessage').value.trim()
     });
@@ -794,7 +818,9 @@ export function apply(ctx: PanelContext, config: Config): void {
       parameters: {
         root: { type: 'string', required: true, description: '项目根目录绝对路径' },
         repoName: { type: 'string', required: true, description: 'GitHub 仓库名' },
-        username: { type: 'string', description: 'GitHub 用户名' },
+          username: { type: 'string', description: 'GitHub 用户名（没有 Git 身份时会自动作为提交姓名）' },
+          gitName: { type: 'string', description: 'Git 提交姓名（可选，优先于 username）' },
+          gitEmail: { type: 'string', description: 'Git 提交邮箱（可选，缺省使用 username@users.noreply.github.com）' },
         visibility: { type: 'string', description: 'public 或 private' },
         commitMessage: { type: 'string', description: '提交信息' },
         push: { type: 'boolean', description: '是否推送，默认 true' },
@@ -803,7 +829,7 @@ export function apply(ctx: PanelContext, config: Config): void {
         schema: { type: 'string' },
         render: (_args: unknown, value: unknown) => [{ type: 'text', text: String(value) }],
       },
-      async execute(args: { root: string; repoName: string; username?: string; visibility?: string; commitMessage?: string; push?: boolean }) {
+        async execute(args: { root: string; repoName: string; username?: string; gitName?: string; gitEmail?: string; visibility?: string; commitMessage?: string; push?: boolean }) {
         return githubInit(args, config.defaultVisibility)
       },
     }),
@@ -866,6 +892,8 @@ export function apply(ctx: PanelContext, config: Config): void {
             root: String(body.root || ''),
             repoName: String(body.repoName || ''),
             username: body.username,
+              gitName: body.gitName,
+              gitEmail: body.gitEmail,
             visibility: body.visibility,
             commitMessage: body.commitMessage,
             push: body.push !== false,
