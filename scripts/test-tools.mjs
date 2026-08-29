@@ -11,6 +11,9 @@ const ctx = {
     fn()
     return () => {}
   },
+  on() {
+    return () => {}
+  },
   tools: {
     register(tool) {
       registered.push(tool)
@@ -23,9 +26,10 @@ const ctx = {
       return () => {}
     },
   },
+  llm: undefined,
 }
 
-apply(ctx, { defaultVisibility: 'public', panelPath: '/portfolio' })
+apply(ctx, { defaultVisibility: 'public', panelPath: '/portfolio', readmePrompt: '' })
 
 const byName = (suffix) => registered.find((t) => t.name.endsWith(suffix))
 const scanTool = byName('scan_repo')
@@ -85,6 +89,7 @@ const readmeResult = await readmeTool.execute({
   description: '一个用于测试的求职项目',
   author: '徐杰',
   repo: 'https://github.com/xjailll/demo-project',
+  prompt: '突出全栈能力，重点写系统架构和数据库设计',
   overwrite: true,
 })
 console.log(readmeResult.slice(0, 800))

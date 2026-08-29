@@ -3,7 +3,7 @@
  *
  * 工具：
  * 1. scan_repo        扫描项目，识别技术栈/结构/敏感信息
- * 2. generate_readme  根据扫描结果生成招聘向 README.md
+ * 2. generate_readme  基于 LLM 生成专业招聘向 README（支持自定义提示词）
  * 3. sanitize_check   检查仓库中的密钥/AppID/本地路径泄露点
  * 4. github_init      初始化 Git、创建 GitHub 仓库并推送
  *
@@ -20,22 +20,27 @@ import { execFileSync } from 'node:child_process'
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import type { Context } from 'cordis'
 import { defineTool } from '@deepseek-ai/dsh-tools'
+import type LlmService from '@deepseek-ai/dsh-llm'
+import { createUserMessage, ReasoningEffortId } from '@deepseek-ai/dsh-llm'
 import z from 'schemastery'
 
 export const name = "@dsh-external/dsh-portfolio-publisher"
-export const inject = ['tools', 'webServer']
+export const inject = ['tools', 'webServer', 'llm']
 
 export interface Config {
   defaultVisibility: 'public' | 'private'
   panelPath: string
+  readmePrompt: string
 }
 
 export const Config = z.object({
   defaultVisibility: z.string().default('public'),
   panelPath: z.string().default('/portfolio'),
+  readmePrompt: z.string().default(''),
 })
 
 type PanelContext = Context & {
+  llm?: LlmService
   webServer: {
     register(route: {
       kind: 'prefix'
@@ -319,19 +324,110 @@ ${extra.repo ? `- 仓库：${extra.repo}` : '- 仓库：待补充'}
 `
 }
 
-async function createReadme(args: { root: string; description?: string; author?: string; repo?: string; overwrite?: boolean }): Promise<{ ok: boolean; path?: string; content?: string; message: string }> {
+function buildReadmePrompt(info: ScanResult, extra: { description?: string; author?: string; repo?: string }, customPrompt?: string): string {
+  const base = `请为以下 GitHub 项目生成一份**专业、有说服力、适合求职作品集展示**的 README.md。
+
+## 项目扫描信息
+
+- 项目名称：${info.name}
+- 项目根目录：${info.root}
+- 文件数量：${info.fileCount}
+- 识别到的技术栈：${info.techStack.join(', ') || '未识别'}
+- 顶层目录：${info.topDirs.join(', ') || '无'}
+- package.json 文件：${info.packageFiles.join(', ') || '无'}
+- 是否已有 README：${info.hasReadme ? '是' : '否'}
+- 是否已有 License：${info.hasLicense ? '是' : '否'}
+- 是否已初始化 Git：${info.hasGit ? '是' : '否'}
+- 检测到的潜在敏感信息数量：${info.secrets.length}
+${extra.description ? `- 项目描述：${extra.description}` : ''}
+${extra.author ? `- 作者：${extra.author}` : ''}
+${extra.repo ? `- 仓库地址：${extra.repo}` : ''}
+
+## 写作要求
+
+1. 使用中文撰写，标题可以带英文副标题，整体专业、克制、有信息密度。
+2. 必须包含以下结构（顺序可微调）：
+   - 项目名称与一句话定位
+   - 技术栈徽章（用 shields.io）
+   - 项目亮点（3-5 条，突出工程能力、业务闭环、难点解决）
+   - 功能特性（按用户端/管理端/后端等维度分组）
+   - 技术栈表格
+   - 系统架构（可用 Mermaid 或文字描述）
+   - 快速开始（安装、配置、启动命令，使用代码块）
+   - API 概览（如适用，用表格）
+   - 项目文档入口
+   - 测试说明
+   - 未来规划
+   - 关于/联系方式
+   - License
+3. 不要编造仓库中不存在的信息；不确定的内容用“待补充/示例”标注。
+4. 不要输出解释性文字，直接输出 Markdown 正文。
+5. 语言要像一位有经验的全栈工程师写的，避免空话套话。
+6. 如果检测到敏感信息，在 README 中加一行提醒：建议先执行安全检查并脱敏。
+${customPrompt ? `\n## 用户额外要求（优先级最高，必须遵守）\n${customPrompt}` : ''}`
+
+  return base
+}
+
+async function generateReadmeWithLlm(
+  ctx: PanelContext,
+  lastRoute: { provider: string; model: string } | null,
+  info: ScanResult,
+  extra: { description?: string; author?: string; repo?: string },
+  customPrompt?: string,
+): Promise<string | null> {
+  if (!ctx.llm || !lastRoute) return null
+  try {
+    const prompt = buildReadmePrompt(info, extra, customPrompt)
+    let text = ''
+    const stream = ctx.llm.stream({
+      provider: lastRoute.provider,
+      model: lastRoute.model,
+      system: '你是一位资深开源项目维护者、技术文档专家和招聘官。你生成的 README 必须专业、真实、有说服力，适合求职作品集展示。',
+      messages: [createUserMessage({ source: { kind: 'user' }, content: [{ type: 'text', text: prompt }] })],
+      temperature: 0.3,
+      reasoningEffort: ReasoningEffortId('off'),
+      maxTokens: 2000,
+    })
+    for await (const chunk of stream) {
+      if (chunk.type === 'text-delta') text += chunk.text
+    }
+    return text.trim() || null
+  } catch {
+    return null
+  }
+}
+
+async function createReadme(
+  ctx: PanelContext,
+  lastRoute: { provider: string; model: string } | null,
+  args: { root: string; description?: string; author?: string; repo?: string; overwrite?: boolean; prompt?: string },
+  config: Config,
+): Promise<{ ok: boolean; path?: string; content?: string; message: string }> {
   const info = await scanRepo(args.root)
   const readmePath = path.join(info.root, 'README.md')
   if (await isFile(readmePath) && !args.overwrite) {
     return { ok: false, path: readmePath, message: `README.md 已存在，未覆盖。如需重新生成请传 overwrite=true。\n\n当前文件：${readmePath}` }
   }
-  const content = renderReadme(info, {
+
+  const extra = {
     description: args.description,
     author: args.author,
     repo: args.repo,
-  })
+  }
+  const customPrompt = args.prompt || config.readmePrompt || undefined
+  const llmContent = await generateReadmeWithLlm(ctx, lastRoute, info, extra, customPrompt)
+  const content = llmContent || renderReadme(info, extra)
+
   await fs.writeFile(readmePath, content, 'utf8')
-  return { ok: true, path: readmePath, content, message: `✅ README.md 已生成：${readmePath}` }
+  return {
+    ok: true,
+    path: readmePath,
+    content,
+    message: llmContent
+      ? `✅ README.md 已由 LLM 生成：${readmePath}`
+      : `✅ README.md 已生成（LLM 不可用，使用内置模板）：${readmePath}`,
+  }
 }
 
 async function githubInit(args: { root: string; repoName: string; username?: string; visibility?: string; commitMessage?: string; push?: boolean }, defaultVisibility: string): Promise<string> {
@@ -435,7 +531,7 @@ function renderPanelHtml(panelPath: string): string {
 <body>
 <div class="wrap">
   <h1>📦 DSH Portfolio Publisher</h1>
-  <p class="muted">扫描仓库 → 生成 README → 安全检查 → 手动确认后发布到 GitHub</p>
+  <p class="muted">扫描仓库 → LLM 生成 README → 安全检查 → 手动确认后发布到 GitHub</p>
 
   <div class="card">
     <label>项目根目录（支持多行批量扫描）</label>
@@ -455,6 +551,8 @@ function renderPanelHtml(panelPath: string): string {
       <input id="author" placeholder="作者名">
       <input id="repo" placeholder="GitHub 仓库地址">
     </div>
+    <label>自定义 README 提示词（可选，会覆盖默认要求）</label>
+    <textarea id="prompt" rows="3" placeholder="例如：突出我的全栈能力，重点写系统架构和数据库设计，语气活泼一点"></textarea>
     <label><input type="checkbox" id="overwrite"> 覆盖已有 README</label>
   </div>
 
@@ -534,6 +632,7 @@ async function generate() {
       description: document.getElementById('description').value,
       author: document.getElementById('author').value,
       repo: document.getElementById('repo').value,
+      prompt: document.getElementById('prompt').value,
       overwrite: document.getElementById('overwrite').checked
     });
     if (data.ok) {
@@ -589,6 +688,13 @@ async function push() {
 export function apply(ctx: PanelContext, config: Config): void {
   const prefix = '_dsh_external_dsh_portfolio_publisher'
 
+  // 捕获主模型路由，供 README LLM 生成复用
+  let lastRoute: { provider: string; model: string } | null = null
+  ctx.on('llm/stream', (options: any, next: any) => {
+    lastRoute = { provider: options.provider, model: options.model }
+    return next()
+  })
+
   ctx.effect(() => ctx.tools.register(
     defineTool({
       name: `${prefix}_scan_repo`,
@@ -629,20 +735,21 @@ export function apply(ctx: PanelContext, config: Config): void {
   ctx.effect(() => ctx.tools.register(
     defineTool({
       name: `${prefix}_generate_readme`,
-      description: '根据扫描结果生成招聘向 README.md 并写入项目根目录',
+      description: '基于 LLM 生成专业招聘向 README.md，支持自定义提示词',
       parameters: {
         root: { type: 'string', required: true, description: '项目根目录绝对路径' },
         description: { type: 'string', description: '一句话项目描述' },
         author: { type: 'string', description: '作者名' },
         repo: { type: 'string', description: 'GitHub 仓库地址' },
+        prompt: { type: 'string', description: '自定义 README 提示词（可选，会覆盖默认要求）' },
         overwrite: { type: 'boolean', description: '是否覆盖已有 README.md，默认 false' },
       },
       output: {
         schema: { type: 'string' },
         render: (_args: unknown, value: unknown) => [{ type: 'text', text: String(value) }],
       },
-      async execute(args: { root: string; description?: string; author?: string; repo?: string; overwrite?: boolean }) {
-        const result = await createReadme(args)
+      async execute(args: { root: string; description?: string; author?: string; repo?: string; prompt?: string; overwrite?: boolean }) {
+        const result = await createReadme(ctx, lastRoute, args, config)
         return result.ok ? result.message + '\n\n' + result.content : result.message
       },
     }),
@@ -738,13 +845,14 @@ export function apply(ctx: PanelContext, config: Config): void {
           return
         }
         if (pathname === `${panelPath}/api/readme`) {
-          const result = await createReadme({
+          const result = await createReadme(ctx, lastRoute, {
             root: String(body.root || ''),
             description: body.description,
             author: body.author,
             repo: body.repo,
+            prompt: body.prompt,
             overwrite: Boolean(body.overwrite),
-          })
+          }, config)
           sendJson(res, 200, result)
           return
         }
