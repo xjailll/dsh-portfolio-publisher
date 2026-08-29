@@ -1,6 +1,6 @@
 {
   "name": "@dsh-external/dsh-portfolio-publisher",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "GitHub 求职仓库一键发布助手：LLM 生成专业 README、扫描项目、脱敏检查、Web 面板、初始化仓库并推送",
   "private": true,
   "type": "module",
