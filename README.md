@@ -5,7 +5,7 @@
 > 扫描本地项目 → LLM 生成专业 README → 安全检查 → Web 可视化面板 → 一键推送 GitHub。
 
 [![DSH](https://img.shields.io/badge/DeepSeek%20Harness-Plugin-4D6BFE)](https://github.com/deepseek-ai/deepseek-harness)
-[![Version](https://img.shields.io/badge/version-0.3.0-22c55e)](https://github.com/xjailll/dsh-portfolio-publisher/releases)
+[![Version](https://img.shields.io/badge/version-0.3.1-22c55e)](https://github.com/xjailll/dsh-portfolio-publisher/releases)
 [![License](https://img.shields.io/badge/License-BSD--3--Clause-blue)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-7.x-3178c6)](https://www.typescriptlang.org/)
 [![Node](https://img.shields.io/badge/Node.js-18%2B-339933)](https://nodejs.org/)
@@ -130,7 +130,7 @@ github_init(
   repoName="my-project",
   username="xjailll",
   gitName="徐杰",
-  gitEmail="2947995340@qq.com",
+  gitEmail="you@example.com",
   visibility="public",
   commitMessage="feat: 初始化项目"
 )
@@ -245,7 +245,8 @@ DSH_CHECKOUT=<checkout> bash scripts/build.sh
 ### 注入
 
 ```bash
-dev_inject_plugin D:\2026论文相关\dsh-portfolio-publisher
+# 请替换为插件解压后的真实目录
+dev_inject_plugin /path/to/dsh-portfolio-publisher
 ```
 
 ### 测试
