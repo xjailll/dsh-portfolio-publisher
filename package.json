@@ -1,7 +1,7 @@
 {
   "name": "@dsh-external/dsh-portfolio-publisher",
-  "version": "0.0.1",
-  "description": "GitHub 求职仓库一键发布助手：扫描项目、生成 README、脱敏、初始化仓库并推送",
+  "version": "0.1.0",
+  "description": "GitHub 求职仓库一键发布助手：扫描项目、生成 README、脱敏检查、Web 面板、初始化仓库并推送",
   "private": true,
   "type": "module",
   "main": "./lib/index.js",
@@ -13,6 +13,7 @@
   "peerDependencies": {
     "@deepseek-ai/dsh-llm": ">=0.0.1-rc <2",
     "@deepseek-ai/dsh-tools": ">=0.0.1-rc <2",
+    "@deepseek-ai/dsh-host-webserver": ">=0.0.1-rc <2",
     "cordis": ">=4.0.0-rc <5",
     "schemastery": "^3.18.0"
   },
